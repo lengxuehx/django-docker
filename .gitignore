@@ -1,0 +1,16 @@
+
+sandbox_config.py
+
+test.py
+*.pyc
+.idea
+.vscode
+tmp_data
+*.sqlite3
+migrations
+*.log
+migrations/*
+CONFIGS.py
+test_take_away/
+staticfiles/
+secret/

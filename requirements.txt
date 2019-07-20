@@ -1,0 +1,16 @@
+django==2.0.2
+djangorestframework==3.8.2
+mysqlclient==1.3.12
+raven==6.4.0
+gunicorn==19.7.1
+django-watchman==0.10.1
+pymodm==0.4.0
+django-filter==1.1.0
+redis==2.10.6
+django-redis==4.4.3
+django-cors-headers==2.2.0
+cryptography==2.4.2
+djangorestframework-xml==1.3.0
+ipython
+
+-i http://pypi.douban.com/simple/ --trusted-host  pypi.douban.com

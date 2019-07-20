@@ -1,0 +1,62 @@
+version: "3.4"
+
+services:
+  nginx:
+    build:
+      context: ./
+      dockerfile: dockerfile-nginx-base
+    image: mysite-nginx:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - web
+  web:
+    build:
+      context: ./
+      dockerfile: dockerfile-mysite
+    image: mysite:master
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - logs:/opt/logs/mysite
+      - media:/opt/media/mysite
+    working_dir: "/opt/projects/mysite"
+    depends_on:
+      - db
+    environment:
+      RUN_ENV: DOCKER
+    command: "/opt/py_virtualenvs/mysite/bin/gunicorn --bind 0.0.0.0:8000 --error-logfile /opt/logs/mysite/gunicorn_error.log --workers 4 --max-requests 1000000 --max-requests-jitter 1000 --limit-request-line 4096 mysite.wsgi"
+
+  db:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8
+    restart: always
+    ports:
+      - "127.0.0.1:3406:3306"
+    environment:
+      MYSQL_DATABASE: mysite
+      MYSQL_USER: docker
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - db_data:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    secrets:
+      - db_root_password
+      - db_password
+
+volumes:
+  logs:
+    name: 'mysite-logs-{{.Task.Slot}}'
+  db_data:
+  media:
+
+secrets:
+  db_root_password:
+    external: true
+  db_password:
+    external: true

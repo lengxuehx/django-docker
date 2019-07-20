@@ -1,0 +1,4 @@
+From nginx:latest
+COPY ./config/nginx/ /etc/nginx/
+RUN mkdir -p /opt/staticfiles/mysite/
+COPY ./staticfiles/ /opt/staticfiles/mysite/

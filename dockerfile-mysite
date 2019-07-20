@@ -1,0 +1,7 @@
+From mysite-base:latest
+RUN mkdir -p /opt/projects/mysite/
+COPY ./ /opt/projects/mysite/
+RUN pip install -U pip && \
+    pip install -i  http://pypi.douban.com/simple/ --trusted-host pypi.douban.com virtualenv && \
+    virtualenv /opt/py_virtualenvs/mysite && \
+    /opt/py_virtualenvs/mysite/bin/pip install --no-cache-dir -r  /opt/projects/mysite/requirements.txt
