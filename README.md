@@ -18,6 +18,7 @@
  
         docker-compose -f production.yml build
         
- 5. 
- 
+ 5. deploy
+         
+        docker stack deploy -c production.yml mysite
         
