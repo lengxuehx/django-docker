@@ -148,7 +148,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = './staticfiles'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/opt/media/virtualx_server'
+MEDIA_ROOT = '/opt/media/mysite'
 
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 

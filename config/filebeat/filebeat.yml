@@ -1,0 +1,19 @@
+filebeat.inputs:
+
+- type: log
+  enabled: true
+  encoding: utf-8
+  paths:
+    - /opt/logs/mysite/app/*/*.log
+    - /opt/logs/mysite/nginx/*.log
+  fields:
+    document_type: mysite
+  multiline:
+    pattern: '^(DEBUG|INFO|WARNING|ERROR)'
+    negate: true
+    match: after
+    max_lines: 200
+    timeout: 5s
+
+output.logstash:
+  hosts: ['your.logstash.server:port']

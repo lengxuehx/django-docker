@@ -4,30 +4,44 @@ services:
   nginx:
     build:
       context: ./
-      dockerfile: dockerfile-nginx-base
-    image: mysite-nginx:latest
+      dockerfile: mysite-nginx
+    image: mysite-nginx:lastest
     ports:
-      - "8080:8080"
+      - "80:8080"
+      - "443:8080"
     depends_on:
       - web
+    volumes:
+      - nginx_logs:/opt/logs/mysite/nginx
+
+  filebeat:
+    build:
+      context: ./
+      dockerfile: mysite-filebeat
+    volumes:
+      - /var/lib/docker/volumes/mysite-app-logs-1/_data:/opt/logs/mysite/app/1
+      - /var/lib/docker/volumes/mysite-app-logs-2/_data:/opt/logs/mysite/app/2
+      - /var/lib/docker/volumes/mysite-nginx-logs/_data:/opt/logs/mysite/nginx
+    image: mysite-filebeat:latest
+
   web:
     build:
       context: ./
-      dockerfile: dockerfile-mysite
-    image: mysite:master
+      dockerfile: mysite-server
+    image: mysite-server:master
     deploy:
       replicas: 2
       restart_policy:
         condition: on-failure
     volumes:
-      - logs:/opt/logs/mysite
+      - app_logs:/opt/logs/mysite/app
       - media:/opt/media/mysite
-    working_dir: "/opt/projects/mysite"
+    working_dir: "/opt/projects/mysite-server"
     depends_on:
       - db
     environment:
       RUN_ENV: DOCKER
-    command: "/opt/py_virtualenvs/mysite/bin/gunicorn --bind 0.0.0.0:8000 --error-logfile /opt/logs/mysite/gunicorn_error.log --workers 4 --max-requests 1000000 --max-requests-jitter 1000 --limit-request-line 4096 mysite.wsgi"
+    command: "/opt/py_virtualenvs/mysite/bin/gunicorn --bind 0.0.0.0:8000 --error-logfile /opt/logs/mysite/app/gunicorn_error.log --workers 4 --max-requests 1000000 --max-requests-jitter 1000 --limit-request-line 4096 mysite.docker.wsgi"
 
   db:
     image: mysql:5.7
@@ -50,8 +64,10 @@ services:
       - db_password
 
 volumes:
-  logs:
-    name: 'mysite-logs-{{.Task.Slot}}'
+  app_logs:
+    name: 'mysite-app-logs-{{.Task.Slot}}'
+  nginx_logs:
+    name: 'mysite-nginx-logs'
   db_data:
   media:
 
